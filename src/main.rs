@@ -1,17 +1,59 @@
+use std::io;
 use crate::game::{Game, Location, Player};
 
 mod game;
 
 fn main() {
     let mut game = Game::new();
+    let mut player = Player::X;
+    let mut board: Option<Location> = None;
 
-    game.place_move(Player::X, Location::TopLeft, Location::Middle);
-    game.place_move(Player::O, Location::TopLeft, Location::TopRight);
-    game.place_move(Player::X, Location::TopLeft, Location::BottomRight);
-    game.place_move(Player::O, Location::TopLeft, Location::TopLeft);
-    game.place_move(Player::X, Location::TopLeft, Location::Top);
-    game.place_move(Player::O, Location::TopLeft, Location::BottomLeft);
-    game.place_move(Player::X, Location::TopLeft, Location::Bottom);
+    while game.winner().is_none() {
+        println!();
+        game.print();
+        println!("\n{}'s turn\n", player.label());
+
+        if board.is_none() {
+            println!("Enter the board location:");
+            let mut input_text = String::new();
+            io::stdin()
+                .read_line(&mut input_text)
+                .expect("failed to read from stdin");
+
+            board = Location::from_input(input_text.trim().to_lowercase().as_str());
+            if board.is_none() {
+                println!("\nInvalid board location");
+                continue;
+            }
+        }
+
+        println!("Enter the cell location:");
+        let mut input_text = String::new();
+        io::stdin()
+            .read_line(&mut input_text)
+            .expect("failed to read from stdin");
+
+        let cell = Location::from_input(input_text.trim().to_lowercase().as_str());
+        if cell.is_none() {
+            println!("\nInvalid cell location");
+            continue;
+        }
+
+        if game.place_move(player, board.unwrap(), cell.unwrap()) {
+            player = player.opponent();
+        } else {
+            println!("\nInvalid move");
+            continue;
+        }
+
+        if game.board_is_won(cell.unwrap()) {
+            board = None;
+        } else {
+            board = Some(cell.unwrap());
+        }
+    }
+
+    println!("\n{} wins!\n", game.winner().unwrap().label());
 
     game.print();
 }

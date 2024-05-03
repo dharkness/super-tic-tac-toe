@@ -4,6 +4,22 @@ pub enum Player {
     O,
 }
 
+impl Player {
+    pub fn label(&self) -> char {
+        match self {
+            Player::X => 'X',
+            Player::O => 'O',
+        }
+    }
+
+    pub fn opponent(&self) -> Player {
+        match self {
+            Player::X => Player::O,
+            Player::O => Player::X,
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub enum Location {
     TopLeft,
@@ -15,6 +31,38 @@ pub enum Location {
     BottomLeft,
     Bottom,
     BottomRight,
+}
+
+impl Location {
+    pub fn from_index(index: usize) -> Option<Location> {
+        match index {
+            0 => Some(Location::TopLeft),
+            1 => Some(Location::Top),
+            2 => Some(Location::TopRight),
+            3 => Some(Location::Left),
+            4 => Some(Location::Middle),
+            5 => Some(Location::Right),
+            6 => Some(Location::BottomLeft),
+            7 => Some(Location::Bottom),
+            8 => Some(Location::BottomRight),
+            _ => None,
+        }
+    }
+
+    pub fn from_input(input: &str) -> Option<Location> {
+        match input {
+            "tl" => Some(Location::TopLeft),
+            "t" => Some(Location::Top),
+            "tr" => Some(Location::TopRight),
+            "l" => Some(Location::Left),
+            "m" => Some(Location::Middle),
+            "r" => Some(Location::Right),
+            "bl" => Some(Location::BottomLeft),
+            "b" => Some(Location::Bottom),
+            "br" => Some(Location::BottomRight),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Hash, Eq, PartialEq)]
@@ -41,8 +89,7 @@ impl Cell {
     pub fn label(&self) -> char {
         match self.0 {
             None => ' ',
-            Some(Player::X) => 'X',
-            Some(Player::O) => 'O',
+            Some(player) => player.label(),
         }
     }
 }
@@ -50,15 +97,58 @@ impl Cell {
 #[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub struct Game {
     boards: [Board; 9],
+    winner: Option<Player>,
 }
 
 impl Game {
     pub fn new() -> Game {
-        Game { boards: [Board::new(); 9] }
+        Game { boards: [Board::new(); 9], winner: None }
     }
 
-    pub fn place_move(&mut self, player: Player, board: Location, cell: Location) {
-        self.boards[board as usize].place_move(player, cell);
+    pub fn place_move(&mut self, player: Player, board: Location, cell: Location) -> bool {
+        if self.boards[board as usize].place_move(player, cell) {
+            if self.boards[board as usize].winner().is_some() {
+                self.winner = self.find_winner();
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn winner(&self) -> Option<Player> {
+        self.winner
+    }
+
+    pub fn find_winner(&self) -> Option<Player> {
+        let winning_combinations = [
+            [Location::TopLeft, Location::Top, Location::TopRight],
+            [Location::Left, Location::Middle, Location::Right],
+            [Location::BottomLeft, Location::Bottom, Location::BottomRight],
+            [Location::TopLeft, Location::Left, Location::BottomLeft],
+            [Location::Top, Location::Middle, Location::Bottom],
+            [Location::TopRight, Location::Right, Location::BottomRight],
+            [Location::TopLeft, Location::Middle, Location::BottomRight],
+            [Location::TopRight, Location::Middle, Location::BottomLeft],
+        ];
+
+        for combination in winning_combinations.iter() {
+            let winners = [
+                self.boards[combination[0] as usize].winner(),
+                self.boards[combination[1] as usize].winner(),
+                self.boards[combination[2] as usize].winner(),
+            ];
+
+            if winners[0].is_some() && winners[0] == winners[1] && winners[1] == winners[2] {
+                return winners[0];
+            }
+        }
+
+        None
+    }
+
+    pub fn board_is_won(&self, board: Location) -> bool {
+        self.boards[board as usize].winner().is_some()
     }
 
     pub fn lines(&self) -> [String; 23] {
@@ -119,6 +209,10 @@ impl Board {
         } else {
             false
         }
+    }
+
+    pub fn winner(&self) -> Option<Player> {
+        self.winner
     }
 
     pub fn find_winner(&self) -> Option<Player> {

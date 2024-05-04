@@ -5,10 +5,10 @@ pub enum Player {
 }
 
 impl Player {
-    pub fn label(&self) -> char {
+    pub fn to_string(&self) -> &'static str {
         match self {
-            Player::X => 'X',
-            Player::O => 'O',
+            Player::X => "X",
+            Player::O => "O",
         }
     }
 
@@ -63,6 +63,20 @@ impl Location {
             _ => None,
         }
     }
+
+    pub fn to_string(&self) -> &'static str {
+        match self {
+            Location::TopLeft => "Top Left",
+            Location::Top => "Top",
+            Location::TopRight => "Top Right",
+            Location::Left => "Left",
+            Location::Middle => "Middle",
+            Location::Right => "Right",
+            Location::BottomLeft => "Bottom Left",
+            Location::Bottom => "Bottom",
+            Location::BottomRight => "Bottom Right",
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Hash, Eq, PartialEq)]
@@ -86,10 +100,10 @@ impl Cell {
         }
     }
 
-    pub fn label(&self) -> char {
+    pub fn to_string(&self) -> &'static str{
         match self.0 {
-            None => ' ',
-            Some(player) => player.label(),
+            None => " ",
+            Some(player) => player.to_string(),
         }
     }
 }
@@ -245,11 +259,11 @@ impl Board {
     pub fn lines(&self) -> [String; 5] {
         match self.winner {
             None => [
-                format!("{}│{}│{}", self.cells[0].label(), self.cells[1].label(), self.cells[2].label()),
+                format!("{}│{}│{}", self.cells[0].to_string(), self.cells[1].to_string(), self.cells[2].to_string()),
                 "─┼─┼─".to_string(),
-                format!("{}│{}│{}", self.cells[3].label(), self.cells[4].label(), self.cells[5].label()),
+                format!("{}│{}│{}", self.cells[3].to_string(), self.cells[4].to_string(), self.cells[5].to_string()),
                 "─┼─┼─".to_string(),
-                format!("{}│{}│{}", self.cells[6].label(), self.cells[7].label(), self.cells[8].label()),
+                format!("{}│{}│{}", self.cells[6].to_string(), self.cells[7].to_string(), self.cells[8].to_string()),
             ],
             Some(Player::X) => [
                 "X   X".to_string(),
@@ -269,10 +283,10 @@ impl Board {
     }
 
     pub fn print(&self) {
-        println!("{}|{}|{}", self.cells[0].label(), self.cells[1].label(), self.cells[2].label());
+        println!("{}|{}|{}", self.cells[0].to_string(), self.cells[1].to_string(), self.cells[2].to_string());
         println!("-+-+-");
-        println!("{}|{}|{}", self.cells[3].label(), self.cells[4].label(), self.cells[5].label());
+        println!("{}|{}|{}", self.cells[3].to_string(), self.cells[4].to_string(), self.cells[5].to_string());
         println!("-+-+-");
-        println!("{}|{}|{}", self.cells[6].label(), self.cells[7].label(), self.cells[8].label());
+        println!("{}|{}|{}", self.cells[6].to_string(), self.cells[7].to_string(), self.cells[8].to_string());
     }
 }

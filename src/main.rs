@@ -11,7 +11,7 @@ fn main() {
     while game.winner().is_none() {
         println!();
         game.print();
-        println!("\n{}'s turn\n", player.label());
+        println!("\n{}'s turn\n", player.to_string());
 
         if board.is_none() {
             println!("Enter the board location:");
@@ -27,7 +27,7 @@ fn main() {
             }
         }
 
-        println!("Enter the cell location:");
+        println!("Enter the {} cell location:", board.unwrap().to_string());
         let mut input_text = String::new();
         io::stdin()
             .read_line(&mut input_text)
@@ -53,7 +53,7 @@ fn main() {
         }
     }
 
-    println!("\n{} wins!\n", game.winner().unwrap().label());
+    println!("\n{} wins!\n", game.winner().unwrap().to_string());
 
     game.print();
 }

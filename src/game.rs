@@ -5,14 +5,14 @@ pub enum Player {
 }
 
 impl Player {
-    pub fn to_string(&self) -> &'static str {
+    pub fn to_string(self) -> &'static str {
         match self {
             Player::X => "X",
             Player::O => "O",
         }
     }
 
-    pub fn opponent(&self) -> Player {
+    pub fn opponent(self) -> Player {
         match self {
             Player::X => Player::O,
             Player::O => Player::X,
@@ -64,7 +64,7 @@ impl Location {
         }
     }
 
-    pub fn to_string(&self) -> &'static str {
+    pub fn to_string(self) -> &'static str {
         match self {
             Location::TopLeft => "Top Left",
             Location::Top => "Top",
@@ -100,7 +100,7 @@ impl Cell {
         }
     }
 
-    pub fn to_string(&self) -> &'static str{
+    pub fn to_string(self) -> &'static str{
         match self.0 {
             None => " ",
             Some(player) => player.to_string(),

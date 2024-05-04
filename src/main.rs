@@ -1,3 +1,10 @@
+#![allow(
+    clippy::collapsible_else_if,
+    clippy::collapsible_if,
+    clippy::too_many_arguments,
+    dead_code
+)]
+
 use std::io;
 use crate::game::{Game, Location, Player};
 
